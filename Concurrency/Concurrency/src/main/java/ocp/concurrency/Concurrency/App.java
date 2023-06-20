@@ -73,9 +73,7 @@ public class App
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
-		
-		// TODO: Submit a runnable here
+
 		
 		/**
 		 * Submit some <code>Runnable</code>(s) here
@@ -108,7 +106,5 @@ public class App
 		{
 			
 		}
-		
-    	
     }
 }
