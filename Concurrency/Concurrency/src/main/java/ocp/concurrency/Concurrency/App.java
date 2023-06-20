@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Concurrency practice
@@ -73,9 +74,41 @@ public class App
 			e.printStackTrace();
 		}
     	
-    	/**
+		
+		// TODO: Submit a runnable here
+		
+		/**
+		 * Submit some <code>Runnable</code>(s) here
+		 * which return no value and which cannot throw
+		 * an exception
+		 */
+		executor.submit(new BasicJob(5));
+		executor.submit(new BasicJob(10));
+		executor.submit(new BasicJob(15));
+		
+		/**
     	 * Shutdown the executor
     	 */
 		executor.shutdown();
+		
+		/**
+		 * We then will await termination of all jobs
+		 * and throw an exception if we time out after
+		 * 1 second of doing so.
+		 * 
+		 * This only works when <code>shutdown()</code>
+		 * has been called FIRST
+		 */
+		try
+		{
+			boolean timedOut = executor.awaitTermination(1, TimeUnit.SECONDS);
+			System.out.println("Did all jobs finish?: "+timedOut);
+		}
+		catch (InterruptedException e) 
+		{
+			
+		}
+		
+    	
     }
 }
