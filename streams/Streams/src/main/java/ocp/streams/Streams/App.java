@@ -214,9 +214,19 @@ public class App
     	reductionExample();
     	
     	/**
+    	 * Do more reduction examples
+    	 */
+    	moreReduction();
+    	
+    	/**
     	 * Do example of groupby now
     	 */
     	grouping();
+    	
+    	/**
+    	 * Some mapping (part 2)
+    	 */
+    	mapping();
     }
     
     private static void peek(Integer i)
@@ -250,7 +260,7 @@ public class App
     }
     
     /**
-     * Reduction usage
+     * Reduction usage (part 1)
      */
     private static void reductionExample()
     {
@@ -274,14 +284,19 @@ public class App
     	Stream<String> namesStream = safeNames.parallelStream();
     	
     	/**
-    	 * Reduction allows one to perform an operation
-    	 * of a function taking in (left, right) and
-    	 * producing a result of the type of those two
-    	 * elements (a <code>String</code> in this case).
+    	 * Reduction basically starts here with "Hello"
+    	 * and then sets the build-up to "Hello"
+    	 * plus the return of the Binary Operation.
     	 * 
-    	 * However, the reduction part is that the first
-    	 * argument to reduce is always `left` whilst the
-    	 * `right` is (per iteration) a stream element
+    	 * So we would have:
+    	 * 
+    	 * result <- "Hello"
+    	 * result <- result ("Hello") + streamElem() ("Abby")
+    	 * result <- result ("Hello Abby") + streamElem() ("Becky")
+    	 * 
+    	 * If we have a parallel stream then there are multiple
+    	 * put into flight and the starts of the build ups
+    	 * will all start with a "Hello"
     	 */
     	String reduction = namesStream.reduce("Hello", (lStr, rStr) -> (lStr+rStr));
     	System.out.println(reduction);
@@ -363,8 +378,85 @@ public class App
     	{
     		System.out.println("Purchases by '"+entry.getKey()+"': "+entry.getValue());
     	}
-
+    }
+    
+    /**
+     * Mapping examples (part 2)
+     */
+    public static void mapping()
+    {
+    	System.out.println("-------");
     	
+    	List<String> names = new ArrayList<String>();
+    	names.add("Abby");
+    	names.add("Becky");
+    	names.add("Claire");
+    	names.add("Dickhead");
+    	names.add("Emma");
+    	names.add("Fransisca");
+    	names.add("Gabriella");
+    	names.add("Jess");
+    	names.add("Jane");
+    	List<String> safeNames = Collections.synchronizedList(names);
     	
+    	/**
+    	 * Let's create our stream now, then map and then
+    	 * collect each Person
+    	 */
+    	safeNames.stream().map(App::fromStringToPerson).forEach((person) -> {
+    		System.out.println("Got person: "+person);
+    	});
+    }
+    
+    private static Person fromStringToPerson(String name)
+    {
+    	return new Person(name);
+    }
+    
+    /**
+     * Reduction example (part 2)
+     */
+    public static void moreReduction()
+    {
+    	System.out.println("-------");
+    	
+    	List<String> names = new ArrayList<String>();
+    	names.add("Abby");
+    	names.add("Becky");
+    	names.add("Claire");
+    	names.add("Dickhead");
+    	names.add("Emma");
+    	names.add("Fransisca");
+    	names.add("Gabriella");
+    	names.add("Jess");
+    	names.add("Jane");
+    	List<String> safeNames = Collections.synchronizedList(names);
+    	
+    	/**
+    	 * Let's create our parallel stream now
+    	 */
+    	Stream<String> namesStream = safeNames.parallelStream();
+    	
+    	/**
+    	 * I will now reduce this using a binary operation
+    	 * which will get an element from the stream and
+    	 * then build that up into left.
+    	 * 
+    	 * Then left gets updated to left+":"+right
+    	 * 
+    	 * left <- Abby
+    	 * 
+    	 * right <- nextElem() (Becky)
+    	 * left <- left (Abby) ":" right (Becky)
+    	 * 
+    	 * An Optional<String> is returned as an empty
+    	 * stream cannot be reduced (compared to identity version
+    	 * the identity is always present hence not an Optional)
+    	 */
+    	Optional<String> reduction = namesStream.reduce((left, right) -> {
+    		return left+":"+right;
+    	});
+    	
+    	System.out.println(reduction.get());
     }
 }
